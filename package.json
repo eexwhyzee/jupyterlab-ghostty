@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-ghostty",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "JupyterLab terminal using ghostty-web (libghostty WASM)",
   "keywords": [
     "jupyter",
