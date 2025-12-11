@@ -56,5 +56,26 @@ export namespace IGhosttyTerminal {
     foreground: string;
     background: string;
     cursor?: string;
+    cursorAccent?: string;
+    selectionBackground?: string;
+    selectionForeground?: string;
+    // Standard ANSI colors (0-7)
+    black?: string;
+    red?: string;
+    green?: string;
+    yellow?: string;
+    blue?: string;
+    magenta?: string;
+    cyan?: string;
+    white?: string;
+    // Bright ANSI colors (8-15)
+    brightBlack?: string;
+    brightRed?: string;
+    brightGreen?: string;
+    brightYellow?: string;
+    brightBlue?: string;
+    brightMagenta?: string;
+    brightCyan?: string;
+    brightWhite?: string;
   }
 }

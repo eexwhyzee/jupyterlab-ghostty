@@ -375,23 +375,91 @@ namespace Private {
   let GhosttyFitAddon_: any;
 
   export const lightTheme: IGhosttyTerminal.IThemeObject = {
-    foreground: '#000',
-    background: '#fff',
-    cursor: '#616161'
+    foreground: '#000000',
+    background: '#ffffff',
+    cursor: '#616161',
+    cursorAccent: '#ffffff',
+    selectionBackground: '#add6ff',
+    selectionForeground: '#000000',
+    black: '#000000',
+    red: '#cd3131',
+    green: '#00bc00',
+    yellow: '#949800',
+    blue: '#0451a5',
+    magenta: '#bc05bc',
+    cyan: '#0598bc',
+    white: '#555555',
+    brightBlack: '#666666',
+    brightRed: '#cd3131',
+    brightGreen: '#14ce14',
+    brightYellow: '#b5ba00',
+    brightBlue: '#0451a5',
+    brightMagenta: '#bc05bc',
+    brightCyan: '#0598bc',
+    brightWhite: '#a5a5a5'
   };
 
   export const darkTheme: IGhosttyTerminal.IThemeObject = {
-    foreground: '#fff',
-    background: '#000',
-    cursor: '#fff'
+    foreground: '#d4d4d4',
+    background: '#1e1e1e',
+    cursor: '#ffffff',
+    cursorAccent: '#000000',
+    selectionBackground: '#264f78',
+    selectionForeground: '#ffffff',
+    black: '#000000',
+    red: '#cd3131',
+    green: '#0dbc79',
+    yellow: '#e5e510',
+    blue: '#2472c8',
+    magenta: '#bc3fbc',
+    cyan: '#11a8cd',
+    white: '#e5e5e5',
+    brightBlack: '#666666',
+    brightRed: '#f14c4c',
+    brightGreen: '#23d18b',
+    brightYellow: '#f5f543',
+    brightBlue: '#3b8eea',
+    brightMagenta: '#d670d6',
+    brightCyan: '#29b8db',
+    brightWhite: '#ffffff'
   };
 
   export function inheritTheme(): IGhosttyTerminal.IThemeObject {
     const bodyStyle = getComputedStyle(document.body);
+    const bg = bodyStyle.getPropertyValue('--jp-layout-color0').trim();
+    // Detect if dark theme by checking background luminance
+    const isDark = bg && bg.toLowerCase() < '#808080';
+    const baseTheme = isDark ? darkTheme : lightTheme;
+
     return {
-      foreground: bodyStyle.getPropertyValue('--jp-ui-font-color0').trim(),
-      background: bodyStyle.getPropertyValue('--jp-layout-color0').trim(),
-      cursor: bodyStyle.getPropertyValue('--jp-ui-font-color1').trim()
+      foreground:
+        bodyStyle.getPropertyValue('--jp-ui-font-color0').trim() ||
+        baseTheme.foreground,
+      background: bg || baseTheme.background,
+      cursor:
+        bodyStyle.getPropertyValue('--jp-ui-font-color1').trim() ||
+        baseTheme.cursor,
+      cursorAccent: baseTheme.cursorAccent,
+      selectionBackground:
+        bodyStyle.getPropertyValue('--jp-editor-selected-background').trim() ||
+        baseTheme.selectionBackground,
+      selectionForeground: baseTheme.selectionForeground,
+      black: baseTheme.black,
+      red: baseTheme.red,
+      green: baseTheme.green,
+      yellow: baseTheme.yellow,
+      blue: baseTheme.blue,
+      magenta: baseTheme.magenta,
+      cyan: baseTheme.cyan,
+      white: baseTheme.white,
+      brightBlack: baseTheme.brightBlack,
+      brightRed: baseTheme.brightRed,
+      brightGreen: baseTheme.brightGreen,
+      brightYellow: baseTheme.brightYellow,
+      brightBlue: baseTheme.brightBlue,
+      brightMagenta: baseTheme.brightMagenta,
+      brightCyan: baseTheme.brightCyan,
+      brightWhite: baseTheme.brightWhite
     };
   }
 
