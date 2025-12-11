@@ -145,6 +145,10 @@ export class GhosttyTerminal
   }
 
   dispose(): void {
+    if (this._resizeTimeout !== null) {
+      clearTimeout(this._resizeTimeout);
+      this._resizeTimeout = null;
+    }
     if (!this.session.isDisposed) {
       if (this.getOption('shutdownOnClose')) {
         this.session.shutdown().catch(reason => {
@@ -311,7 +315,7 @@ export class GhosttyTerminal
   private _resizeTerminal(): void {
     if (!this._term || !this._fitAddon) return;
 
-    // Use FitAddon for proper terminal sizing
+    // Use FitAddon for proper terminal sizing (immediate UI update)
     if (this._options.autoFit) {
       try {
         this._fitAddon.fit();
@@ -327,8 +331,25 @@ export class GhosttyTerminal
       this._offsetHeight = this.node.offsetHeight;
     }
 
-    this._setSessionSize();
+    // Debounce PTY resize to prevent vim/editor corruption
+    this._schedulePtyResize();
     this._needsResize = false;
+  }
+
+  private _schedulePtyResize(): void {
+    if (this._resizeTimeout !== null) {
+      clearTimeout(this._resizeTimeout);
+    }
+
+    this._resizeTimeout = window.setTimeout(() => {
+      // Double requestAnimationFrame to ensure terminal apps like vim are ready
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this._setSessionSize();
+        });
+      });
+      this._resizeTimeout = null;
+    }, 300);
   }
 
   private _setSessionSize(): void {
@@ -364,6 +385,7 @@ export class GhosttyTerminal
   private _themeChanged = new Signal<this, void>(this);
   private _pendingOutput = '';
   private _writeScheduled = false;
+  private _resizeTimeout: number | null = null;
 }
 
 namespace Private {
