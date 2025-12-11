@@ -6,6 +6,18 @@ A JupyterLab extension that provides a terminal emulator powered by [ghostty-web
 
 - JupyterLab >= 4.0.0
 
+## Installation
+
+```bash
+pip install jupyterlab-ghostty
+```
+
+## Uninstall
+
+```bash
+pip uninstall jupyterlab-ghostty
+```
+
 ## Development Installation
 
 For a development installation:
