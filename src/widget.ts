@@ -13,6 +13,8 @@ import { IGhosttyTerminal } from './tokens';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GhosttyTerm = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type GhosttyFitAddon = any;
 
 const TERMINAL_CLASS = 'jp-GhosttyTerminal';
 const TERMINAL_BODY_CLASS = 'jp-GhosttyTerminal-body';
@@ -59,8 +61,9 @@ export class GhosttyTerminal
       scrollback: this._options.scrollback,
       cursorBlink: this._options.cursorBlink
     })
-      .then(term => {
+      .then(({ term, fitAddon }) => {
         this._term = term;
+        this._fitAddon = fitAddon;
         this._initializeTerm();
 
         this.id = `jp-GhosttyTerminal-${Private.id++}`;
@@ -306,12 +309,14 @@ export class GhosttyTerminal
   }
 
   private _resizeTerminal(): void {
-    if (!this._term) return;
+    if (!this._term || !this._fitAddon) return;
 
+    // Use FitAddon for proper terminal sizing
     if (this._options.autoFit) {
-      const dims = this._calculateDimensions();
-      if (dims) {
-        this._term.resize(dims.cols, dims.rows);
+      try {
+        this._fitAddon.fit();
+      } catch (err) {
+        console.error('Error fitting terminal:', err);
       }
     }
 
@@ -324,23 +329,6 @@ export class GhosttyTerminal
 
     this._setSessionSize();
     this._needsResize = false;
-  }
-
-  private _calculateDimensions(): { cols: number; rows: number } | null {
-    if (!this._term) return null;
-
-    const width = this.node.clientWidth;
-    const height = this.node.clientHeight;
-
-    // Estimate character dimensions since ghostty-web doesn't expose this directly
-    const fontSize = this._options.fontSize;
-    const charWidth = fontSize * 0.6;
-    const charHeight = fontSize * (this._options.lineHeight || 1.0) * 1.2;
-
-    const cols = Math.max(2, Math.floor(width / charWidth) - 1);
-    const rows = Math.max(1, Math.floor(height / charHeight) - 1);
-
-    return { cols, rows };
   }
 
   private _setSessionSize(): void {
@@ -370,6 +358,7 @@ export class GhosttyTerminal
   private _isReady = false;
   private _ready = new PromiseDelegate<void>();
   private _term: GhosttyTerm | null = null;
+  private _fitAddon: GhosttyFitAddon | null = null;
   private _termOpened = false;
   private _trans: TranslationBundle;
   private _themeChanged = new Signal<this, void>(this);
@@ -382,6 +371,8 @@ namespace Private {
   let initialized = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let GhosttyTerminal_: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let GhosttyFitAddon_: any;
 
   export const lightTheme: IGhosttyTerminal.IThemeObject = {
     foreground: '#000',
@@ -421,13 +412,17 @@ namespace Private {
   export async function createTerminal(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options: any
-  ): Promise<GhosttyTerm> {
+  ): Promise<{ term: GhosttyTerm; fitAddon: GhosttyFitAddon }> {
     if (!initialized) {
       const ghostty = await import('ghostty-web');
       await ghostty.init();
       GhosttyTerminal_ = ghostty.Terminal;
+      GhosttyFitAddon_ = ghostty.FitAddon;
       initialized = true;
     }
-    return new GhosttyTerminal_(options);
+    const term = new GhosttyTerminal_(options);
+    const fitAddon = new GhosttyFitAddon_();
+    term.loadAddon(fitAddon);
+    return { term, fitAddon };
   }
 }
