@@ -331,7 +331,17 @@ export class GhosttyTerminal
       this._offsetHeight = this.node.offsetHeight;
     }
 
-    // Debounce PTY resize to prevent vim/editor corruption
+    // Only send resize to PTY if dimensions actually changed
+    const { cols, rows } = this._term;
+    if (cols === this._lastCols && rows === this._lastRows) {
+      this._needsResize = false;
+      return;
+    }
+
+    this._lastCols = cols;
+    this._lastRows = rows;
+
+    // Debounce PTY resize to prevent vim corruption
     this._schedulePtyResize();
     this._needsResize = false;
   }
@@ -386,6 +396,8 @@ export class GhosttyTerminal
   private _pendingOutput = '';
   private _writeScheduled = false;
   private _resizeTimeout: number | null = null;
+  private _lastCols = 0;
+  private _lastRows = 0;
 }
 
 namespace Private {
