@@ -284,28 +284,13 @@ export class GhosttyTerminal
     switch (msg.type) {
       case 'stdout':
         if (msg.content) {
-          this._pendingOutput += msg.content[0] as string;
-          this._scheduleWrite();
+          this._term?.write(msg.content[0] as string);
         }
         break;
       case 'disconnect':
         this._term?.write('\r\n\r\n[Finished… Term Session]\r\n');
         break;
     }
-  }
-
-  private _scheduleWrite(): void {
-    if (this._writeScheduled) {
-      return;
-    }
-    this._writeScheduled = true;
-    requestAnimationFrame(() => {
-      if (this._pendingOutput && this._term) {
-        this._term.write(this._pendingOutput);
-        this._pendingOutput = '';
-      }
-      this._writeScheduled = false;
-    });
   }
 
   private _resizeTerminal(): void {
@@ -362,8 +347,6 @@ export class GhosttyTerminal
   private _termOpened = false;
   private _trans: TranslationBundle;
   private _themeChanged = new Signal<this, void>(this);
-  private _pendingOutput = '';
-  private _writeScheduled = false;
 }
 
 namespace Private {
