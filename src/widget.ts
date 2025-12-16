@@ -11,9 +11,7 @@ import { ISignal, Signal } from '@lumino/signaling';
 import { Widget } from '@lumino/widgets';
 import { IGhosttyTerminal } from './tokens';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GhosttyTerm = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GhosttyFitAddon = any;
 
 const TERMINAL_CLASS = 'jp-GhosttyTerminal';
@@ -352,9 +350,7 @@ export class GhosttyTerminal
 namespace Private {
   export let id = 0;
   let initialized = false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let GhosttyTerminal_: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let GhosttyFitAddon_: any;
 
   export const lightTheme: IGhosttyTerminal.IThemeObject = {
@@ -461,7 +457,6 @@ namespace Private {
   }
 
   export async function createTerminal(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options: any
   ): Promise<{ term: GhosttyTerm; fitAddon: GhosttyFitAddon }> {
     if (!initialized) {
