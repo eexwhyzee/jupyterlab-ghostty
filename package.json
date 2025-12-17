@@ -2,13 +2,7 @@
   "name": "jupyterlab-ghostty",
   "version": "0.0.2",
   "description": "JupyterLab terminal using ghostty-web (libghostty WASM)",
-  "keywords": [
-    "jupyter",
-    "jupyterlab",
-    "jupyterlab-extension",
-    "terminal",
-    "ghostty"
-  ],
+  "keywords": ["jupyter", "jupyterlab", "jupyterlab-extension", "terminal", "ghostty"],
   "homepage": "https://github.com/eexwhyzee/jupyterlab-ghostty",
   "license": "BSD-3-Clause",
   "author": {
@@ -75,10 +69,7 @@
     "rimraf": "^5.0.0",
     "typescript": "~5.0.0"
   },
-  "sideEffects": [
-    "style/**/*.css",
-    "style/index.js"
-  ],
+  "sideEffects": ["style/**/*.css", "style/index.js"],
   "styleModule": "style/index.js",
   "publishConfig": {
     "access": "public"
