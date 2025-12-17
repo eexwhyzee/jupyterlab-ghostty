@@ -9,7 +9,8 @@
       "recommended": true,
       "complexity": {
         "noUselessTypeConstraint": "error",
-        "useLiteralKeys": "off"
+        "useLiteralKeys": "off",
+        "noForEach": "off"
       },
       "correctness": {
         "noUnusedVariables": "warn",
@@ -42,12 +43,6 @@
     }
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      "lib",
-      "dist",
-      "*.d.ts",
-      "jupyterlab_ghostty"
-    ]
+    "ignore": ["node_modules", "lib", "dist", "*.d.ts", "jupyterlab_ghostty"]
   }
 }
