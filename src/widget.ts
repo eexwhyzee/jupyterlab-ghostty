@@ -319,7 +319,8 @@ export class GhosttyTerminal extends Widget implements IGhosttyTerminal.ITermina
   private _themeChanged = new Signal<this, void>(this);
 }
 
-namespace Private {
+/** @internal Exported for testing purposes */
+export namespace Private {
   export const counter = { id: 0 };
   let initialized = false;
   let GhosttyTerminal_: any;
