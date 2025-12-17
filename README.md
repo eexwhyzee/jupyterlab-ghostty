@@ -65,3 +65,14 @@ Configure the Ghostty terminal in JupyterLab Settings:
 | `shutdownOnClose` | Shut down session when closing | `false` |
 | `closeOnExit` | Close widget when session ends | `true` |
 
+## Testing
+
+Run the test suite:
+
+```bash
+# Run tests
+jlpm test
+
+# Run tests with coverage report
+jlpm test:coverage
+```
