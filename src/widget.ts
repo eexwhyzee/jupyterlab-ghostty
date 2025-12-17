@@ -1,13 +1,9 @@
-import { Terminal as TerminalNS } from '@jupyterlab/services';
-import {
-  ITranslator,
-  nullTranslator,
-  TranslationBundle
-} from '@jupyterlab/translation';
+import type { Terminal as TerminalNS } from '@jupyterlab/services';
+import { type ITranslator, type TranslationBundle, nullTranslator } from '@jupyterlab/translation';
 import { PromiseDelegate } from '@lumino/coreutils';
 import { Platform } from '@lumino/domutils';
-import { Message, MessageLoop } from '@lumino/messaging';
-import { ISignal, Signal } from '@lumino/signaling';
+import { type Message, MessageLoop } from '@lumino/messaging';
+import { type ISignal, Signal } from '@lumino/signaling';
 import { Widget } from '@lumino/widgets';
 import { IGhosttyTerminal } from './tokens';
 
@@ -17,10 +13,7 @@ type GhosttyFitAddon = any;
 const TERMINAL_CLASS = 'jp-GhosttyTerminal';
 const TERMINAL_BODY_CLASS = 'jp-GhosttyTerminal-body';
 
-export class GhosttyTerminal
-  extends Widget
-  implements IGhosttyTerminal.ITerminal
-{
+export class GhosttyTerminal extends Widget implements IGhosttyTerminal.ITerminal {
   constructor(
     session: TerminalNS.ITerminalConnection,
     options: Partial<IGhosttyTerminal.IOptions> = {},
@@ -35,10 +28,11 @@ export class GhosttyTerminal
 
     this.addClass(TERMINAL_CLASS);
     this._setThemeAttribute(this._options.theme);
+    this.id = `jp-GhosttyTerminal-${Private.counter.id++}`;
 
     let buffer = '';
     const bufferMessage = (
-      sender: TerminalNS.ITerminalConnection,
+      _sender: TerminalNS.ITerminalConnection,
       msg: TerminalNS.IMessage
     ): void => {
       if (msg.type === 'stdout' && msg.content) {
@@ -64,7 +58,6 @@ export class GhosttyTerminal
         this._fitAddon = fitAddon;
         this._initializeTerm();
 
-        this.id = `jp-GhosttyTerminal-${Private.id++}`;
         this.title.label = this._trans.__('Ghostty Terminal');
         this._isReady = true;
         this._ready.resolve();
@@ -78,10 +71,7 @@ export class GhosttyTerminal
         if (session.connectionStatus === 'connected') {
           this._initialConnection();
         } else {
-          session.connectionStatusChanged.connect(
-            this._initialConnection,
-            this
-          );
+          session.connectionStatusChanged.connect(this._initialConnection, this);
         }
         this.update();
       })
@@ -97,9 +87,7 @@ export class GhosttyTerminal
 
   readonly session: TerminalNS.ITerminalConnection;
 
-  getOption<K extends keyof IGhosttyTerminal.IOptions>(
-    option: K
-  ): IGhosttyTerminal.IOptions[K] {
+  getOption<K extends keyof IGhosttyTerminal.IOptions>(option: K): IGhosttyTerminal.IOptions[K] {
     return this._options[option];
   }
 
@@ -128,9 +116,7 @@ export class GhosttyTerminal
         this._term.options.scrollback = value as number | undefined;
         break;
       case 'theme':
-        this._term.options.theme = Private.getTheme(
-          value as IGhosttyTerminal.Theme
-        );
+        this._term.options.theme = Private.getTheme(value as IGhosttyTerminal.Theme);
         this._setThemeAttribute(value as IGhosttyTerminal.Theme);
         this._themeChanged.emit();
         break;
@@ -164,7 +150,7 @@ export class GhosttyTerminal
   }
 
   hasSelection(): boolean {
-    return this._isReady ? this._term?.hasSelection() ?? false : false;
+    return this._isReady ? (this._term?.hasSelection() ?? false) : false;
   }
 
   paste(data: string): void {
@@ -174,7 +160,7 @@ export class GhosttyTerminal
   }
 
   getSelection(): string | null {
-    return this._isReady ? this._term?.getSelection() ?? null : null;
+    return this._isReady ? (this._term?.getSelection() ?? null) : null;
   }
 
   processMessage(msg: Message): void {
@@ -188,11 +174,11 @@ export class GhosttyTerminal
     return this._themeChanged;
   }
 
-  protected onAfterAttach(msg: Message): void {
+  protected onAfterAttach(_msg: Message): void {
     this.update();
   }
 
-  protected onAfterShow(msg: Message): void {
+  protected onAfterShow(_msg: Message): void {
     this.update();
   }
 
@@ -203,7 +189,7 @@ export class GhosttyTerminal
     this.update();
   }
 
-  protected onUpdateRequest(msg: Message): void {
+  protected onUpdateRequest(_msg: Message): void {
     if (!this.isVisible || !this.isAttached || !this._isReady) {
       return;
     }
@@ -222,11 +208,11 @@ export class GhosttyTerminal
     }
   }
 
-  protected onFitRequest(msg: Message): void {
+  protected onFitRequest(_msg: Message): void {
     MessageLoop.sendMessage(this, Widget.ResizeMessage.UnknownSize);
   }
 
-  protected onActivateRequest(msg: Message): void {
+  protected onActivateRequest(_msg: Message): void {
     this._term?.focus();
   }
 
@@ -241,14 +227,11 @@ export class GhosttyTerminal
     if (this._options.initialCommand) {
       this.session.send({
         type: 'stdin',
-        content: [this._options.initialCommand + '\r']
+        content: [`${this._options.initialCommand}\r`]
       });
     }
 
-    this.session.connectionStatusChanged.disconnect(
-      this._initialConnection,
-      this
-    );
+    this.session.connectionStatusChanged.disconnect(this._initialConnection, this);
   }
 
   private _initializeTerm(): void {
@@ -275,10 +258,7 @@ export class GhosttyTerminal
     }
   }
 
-  private _onMessage(
-    sender: TerminalNS.ITerminalConnection,
-    msg: TerminalNS.IMessage
-  ): void {
+  private _onMessage(_sender: TerminalNS.ITerminalConnection, msg: TerminalNS.IMessage): void {
     switch (msg.type) {
       case 'stdout':
         if (msg.content) {
@@ -317,21 +297,13 @@ export class GhosttyTerminal
   private _setSessionSize(): void {
     if (!this._term || this.isDisposed) return;
 
-    const content = [
-      this._term.rows,
-      this._term.cols,
-      this._offsetHeight,
-      this._offsetWidth
-    ];
+    const content = [this._term.rows, this._term.cols, this._offsetHeight, this._offsetWidth];
     this.session.send({ type: 'set_size', content });
   }
 
   private _setThemeAttribute(theme: string | null | undefined): void {
     if (this.isDisposed) return;
-    this.node.setAttribute(
-      'data-term-theme',
-      theme ? theme.toLowerCase() : 'inherit'
-    );
+    this.node.setAttribute('data-term-theme', theme ? theme.toLowerCase() : 'inherit');
   }
 
   private _needsResize = true;
@@ -348,7 +320,7 @@ export class GhosttyTerminal
 }
 
 namespace Private {
-  export let id = 0;
+  export const counter = { id: 0 };
   let initialized = false;
   let GhosttyTerminal_: any;
   let GhosttyFitAddon_: any;
@@ -411,13 +383,9 @@ namespace Private {
     const baseTheme = isDark ? darkTheme : lightTheme;
 
     return {
-      foreground:
-        bodyStyle.getPropertyValue('--jp-ui-font-color0').trim() ||
-        baseTheme.foreground,
+      foreground: bodyStyle.getPropertyValue('--jp-ui-font-color0').trim() || baseTheme.foreground,
       background: bg || baseTheme.background,
-      cursor:
-        bodyStyle.getPropertyValue('--jp-ui-font-color1').trim() ||
-        baseTheme.cursor,
+      cursor: bodyStyle.getPropertyValue('--jp-ui-font-color1').trim() || baseTheme.cursor,
       cursorAccent: baseTheme.cursorAccent,
       selectionBackground:
         bodyStyle.getPropertyValue('--jp-editor-selected-background').trim() ||
@@ -442,15 +410,12 @@ namespace Private {
     };
   }
 
-  export function getTheme(
-    theme: IGhosttyTerminal.Theme
-  ): IGhosttyTerminal.IThemeObject {
+  export function getTheme(theme: IGhosttyTerminal.Theme): IGhosttyTerminal.IThemeObject {
     switch (theme) {
       case 'light':
         return lightTheme;
       case 'dark':
         return darkTheme;
-      case 'inherit':
       default:
         return inheritTheme();
     }
