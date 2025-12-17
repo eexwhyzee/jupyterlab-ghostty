@@ -1,7 +1,7 @@
 import {
   ILayoutRestorer,
-  JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  type JupyterFrontEnd,
+  type JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import {
   ICommandPalette,
@@ -11,15 +11,15 @@ import {
 } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
 import { IMainMenu } from '@jupyterlab/mainmenu';
-import { IRunningSessionManagers, IRunningSessions } from '@jupyterlab/running';
-import { Terminal, TerminalAPI } from '@jupyterlab/services';
+import { IRunningSessionManagers, type IRunningSessions } from '@jupyterlab/running';
+import { type Terminal, TerminalAPI } from '@jupyterlab/services';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { ITranslator } from '@jupyterlab/translation';
 import { LabIcon } from '@jupyterlab/ui-components';
 import { Menu } from '@lumino/widgets';
 
+import { type IGhosttyTerminal, IGhosttyTerminalTracker } from './tokens';
 import { GhosttyTerminal } from './widget';
-import { IGhosttyTerminal, IGhosttyTerminalTracker } from './tokens';
 
 const ghosttyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
   <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -76,16 +76,12 @@ function activate(
   const category = trans.__('Ghostty Terminal');
   const namespace = 'ghostty-terminal';
 
-  const tracker = new WidgetTracker<
-    MainAreaWidget<IGhosttyTerminal.ITerminal>
-  >({
+  const tracker = new WidgetTracker<MainAreaWidget<IGhosttyTerminal.ITerminal>>({
     namespace
   });
 
   if (!serviceManager.terminals.isAvailable()) {
-    console.warn(
-      'Ghostty terminal disabled: terminals not available on server'
-    );
+    console.warn('Ghostty terminal disabled: terminals not available on server');
     return tracker;
   }
 
@@ -101,9 +97,9 @@ function activate(
 
   function updateOptions(settings: ISettingRegistry.ISettings): void {
     const composite = settings.composite as Record<string, unknown>;
-    Object.keys(composite).forEach(key => {
+    for (const key of Object.keys(composite)) {
       (options as Record<string, unknown>)[key] = composite[key];
-    });
+    }
   }
 
   function updateTracker(): void {
@@ -138,23 +134,17 @@ function activate(
 
   commands.addCommand(CommandIDs.createNew, {
     label: args =>
-      args['isPalette']
-        ? trans.__('New Ghostty Terminal')
-        : trans.__('Ghostty Terminal'),
+      args['isPalette'] ? trans.__('New Ghostty Terminal') : trans.__('Ghostty Terminal'),
     caption: trans.__('Start a new Ghostty terminal session'),
     icon: args => (args['isPalette'] ? undefined : ghosttyIcon),
     execute: async args => {
       const name = args['name'] as string;
       const cwd = args['cwd'] as string;
-      const localPath = cwd
-        ? serviceManager.contents.localPath(cwd)
-        : undefined;
+      const localPath = cwd ? serviceManager.contents.localPath(cwd) : undefined;
 
-      let session;
+      let session: Terminal.ITerminalConnection;
       if (name) {
-        const models = await TerminalAPI.listRunning(
-          serviceManager.serverSettings
-        );
+        const models = await TerminalAPI.listRunning(serviceManager.serverSettings);
         if (models.map(d => d.name).includes(name)) {
           session = serviceManager.terminals.connectTo({ model: { name } });
         } else {
@@ -187,9 +177,7 @@ function activate(
         return;
       }
 
-      const existing = tracker.find(
-        widget => widget.content.session.name === name
-      );
+      const existing = tracker.find(widget => widget.content.session.name === name);
       if (existing) {
         app.shell.activateById(existing.id);
         return existing;
@@ -244,9 +232,7 @@ function activate(
   commands.addCommand(CommandIDs.setTheme, {
     label: args => {
       const displayName = args['displayName'] as string;
-      return args['isPalette']
-        ? trans.__('Use Ghostty Theme: %1', displayName)
-        : displayName;
+      return args['isPalette'] ? trans.__('Use Ghostty Theme: %1', displayName) : displayName;
     },
     isToggled: args => args['theme'] === options.theme,
     execute: async args => {
@@ -256,16 +242,16 @@ function activate(
   });
 
   if (palette) {
-    [
+    for (const command of [
       CommandIDs.createNew,
       CommandIDs.refresh,
       CommandIDs.increaseFont,
       CommandIDs.decreaseFont
-    ].forEach(command => {
+    ]) {
       palette.addItem({ command, category, args: { isPalette: true } });
-    });
+    }
 
-    ['inherit', 'light', 'dark'].forEach(theme => {
+    for (const theme of ['inherit', 'light', 'dark']) {
       palette.addItem({
         command: CommandIDs.setTheme,
         category,
@@ -275,7 +261,7 @@ function activate(
           isPalette: true
         }
       });
-    });
+    }
   }
 
   if (launcher) {
@@ -289,7 +275,7 @@ function activate(
   if (mainMenu) {
     const themeMenu = new Menu({ commands });
     themeMenu.title.label = trans._p('menu', 'Ghostty Theme');
-    ['inherit', 'light', 'dark'].forEach(theme => {
+    for (const theme of ['inherit', 'light', 'dark']) {
       themeMenu.addItem({
         command: CommandIDs.setTheme,
         args: {
@@ -298,7 +284,7 @@ function activate(
           isPalette: false
         }
       });
-    });
+    }
 
     mainMenu.settingsMenu.addGroup(
       [
@@ -341,10 +327,7 @@ function activate(
       running: () =>
         Array.from(manager.running())
           .filter(model => {
-            return (
-              tracker.find(w => w.content.session.name === model.name) !==
-              undefined
-            );
+            return tracker.find(w => w.content.session.name === model.name) !== undefined;
           })
           .map(model => new RunningGhosttyTerminal(model)),
       shutdownAll: () => {

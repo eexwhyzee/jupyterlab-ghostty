@@ -1,8 +1,8 @@
-import { IWidgetTracker, MainAreaWidget } from '@jupyterlab/apputils';
+import type { IWidgetTracker, MainAreaWidget } from '@jupyterlab/apputils';
+import type { Terminal } from '@jupyterlab/services';
 import { Token } from '@lumino/coreutils';
-import { ISignal } from '@lumino/signaling';
-import { Widget } from '@lumino/widgets';
-import { Terminal } from '@jupyterlab/services';
+import type { ISignal } from '@lumino/signaling';
+import type { Widget } from '@lumino/widgets';
 
 export const IGhosttyTerminalTracker = new Token<IGhosttyTerminalTracker>(
   'jupyterlab-ghostty:IGhosttyTerminalTracker',
