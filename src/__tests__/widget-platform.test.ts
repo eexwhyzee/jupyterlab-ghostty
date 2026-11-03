@@ -108,19 +108,22 @@ describe('GhosttyTerminal platform-specific behavior', () => {
       expect(mockTerm.attachCustomKeyEventHandler).toHaveBeenCalled();
     });
 
-    it('returns false for Ctrl+C when text is selected (allows browser copy)', async () => {
+    it('copies selected text and consumes Ctrl+C', async () => {
       const mockSession = createMockSession();
       const terminal = new GhosttyTerminal(mockSession as any);
       await terminal.ready;
 
       const handler = mockTerm.attachCustomKeyEventHandler.mock.calls[0][0];
       mockTerm.hasSelection.mockReturnValue(true);
+      mockTerm.getSelection.mockReturnValue('selected text');
 
       const ctrlCEvent = { ctrlKey: true, key: 'c' } as KeyboardEvent;
-      expect(handler(ctrlCEvent)).toBe(false);
+      expect(handler(ctrlCEvent)).toBe(true);
+      const { Clipboard } = await import('@jupyterlab/apputils');
+      expect(Clipboard.copyToSystem).toHaveBeenCalledWith('selected text');
     });
 
-    it('returns true for Ctrl+C when no text is selected (sends to terminal)', async () => {
+    it('passes Ctrl+C through when no text is selected', async () => {
       const mockSession = createMockSession();
       const terminal = new GhosttyTerminal(mockSession as any);
       await terminal.ready;
@@ -129,10 +132,12 @@ describe('GhosttyTerminal platform-specific behavior', () => {
       mockTerm.hasSelection.mockReturnValue(false);
 
       const ctrlCEvent = { ctrlKey: true, key: 'c' } as KeyboardEvent;
-      expect(handler(ctrlCEvent)).toBe(true);
+      expect(handler(ctrlCEvent)).toBe(false);
+      const { Clipboard } = await import('@jupyterlab/apputils');
+      expect(Clipboard.copyToSystem).not.toHaveBeenCalled();
     });
 
-    it('returns true for other key combinations', async () => {
+    it('passes other keys through to ghostty-web', async () => {
       const mockSession = createMockSession();
       const terminal = new GhosttyTerminal(mockSession as any);
       await terminal.ready;
@@ -140,13 +145,13 @@ describe('GhosttyTerminal platform-specific behavior', () => {
       const handler = mockTerm.attachCustomKeyEventHandler.mock.calls[0][0];
 
       // Ctrl+V should pass through
-      expect(handler({ ctrlKey: true, key: 'v' } as KeyboardEvent)).toBe(true);
+      expect(handler({ ctrlKey: true, key: 'v' } as KeyboardEvent)).toBe(false);
 
       // Regular keys should pass through
-      expect(handler({ ctrlKey: false, key: 'a' } as KeyboardEvent)).toBe(true);
+      expect(handler({ ctrlKey: false, key: 'a' } as KeyboardEvent)).toBe(false);
 
       // Ctrl+other keys should pass through
-      expect(handler({ ctrlKey: true, key: 'z' } as KeyboardEvent)).toBe(true);
+      expect(handler({ ctrlKey: true, key: 'z' } as KeyboardEvent)).toBe(false);
     });
   });
 

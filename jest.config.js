@@ -9,6 +9,7 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
   moduleNameMapper: {
+    '^@jupyterlab/apputils$': '<rootDir>/src/__mocks__/@jupyterlab/apputils.ts',
     '^ghostty-web$': '<rootDir>/src/__mocks__/ghostty-web.ts',
     '^@jupyterlab/services$': '<rootDir>/src/__mocks__/@jupyterlab/services.ts',
     '^@jupyterlab/translation$': '<rootDir>/src/__mocks__/@jupyterlab/translation.ts',

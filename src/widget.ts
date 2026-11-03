@@ -1,3 +1,4 @@
+import { Clipboard } from '@jupyterlab/apputils';
 import type { Terminal as TerminalNS } from '@jupyterlab/services';
 import { type ITranslator, type TranslationBundle, nullTranslator } from '@jupyterlab/translation';
 import { PromiseDelegate } from '@lumino/coreutils';
@@ -250,10 +251,12 @@ export class GhosttyTerminal extends Widget implements IGhosttyTerminal.ITermina
     // On non-Mac platforms, allow Ctrl+C to copy when text is selected
     if (!Platform.IS_MAC) {
       term.attachCustomKeyEventHandler((event: KeyboardEvent) => {
+        // Unlike xterm.js, ghostty-web consumes the key when this returns true.
         if (event.ctrlKey && event.key === 'c' && term.hasSelection()) {
-          return false;
+          Clipboard.copyToSystem(term.getSelection());
+          return true;
         }
-        return true;
+        return false;
       });
     }
   }

@@ -3,6 +3,8 @@
  */
 
 .jp-GhosttyTerminal {
+  /* Ghostty draws its own cursor; hide the contenteditable browser caret. */
+  caret-color: transparent;
   display: flex;
   flex-direction: column;
   min-width: 240px;

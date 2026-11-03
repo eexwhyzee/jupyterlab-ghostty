@@ -3708,10 +3708,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ghostty-web@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "ghostty-web@npm:0.3.0"
-  checksum: b4667536e90fe2033ef3b569cb88edd740a54dd4d4d7d7c27942beb0129fe63e8e0fd9973f925bcbce4807d4562636c42b796ba798d39608010626a8bdd4fad5
+"ghostty-web@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "ghostty-web@npm:0.4.0"
+  checksum: a3ddc06553c364e878fbf5baa06524b78a7836f0cb9c37a9d66b63076c61ff56ea275e7ae42a0f5ac70e0930106f90e2a2ca0ed25410dc431c0b5534b8095403
   languageName: node
   linkType: hard
 
@@ -5109,7 +5109,7 @@ __metadata:
     "@types/jest": ^29.5.0
     "@types/json-schema": ^7.0.11
     "@types/node": ^18.0.0
-    ghostty-web: ^0.3.0
+    ghostty-web: ^0.4.0
     husky: ^9.0.0
     jest: ^29.7.0
     jest-environment-jsdom: ^29.7.0
